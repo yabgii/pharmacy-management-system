@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Receipt #<%= sale.id %> - Pharmacy</title>
+    <style>
+      @media print {
+        .no-print {
+          display: none;
+        }
+        body {
+          margin: 0;
+          padding: 0;
+          background: white;
+        }
+        .receipt {
+          box-shadow: none;
+          margin: 0;
+          padding: 10px;
+        }
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Courier New", Courier, monospace;
+        background: #f0f2f5;
+        padding: 20px;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .receipt-container {
+        max-width: 400px;
+        margin: auto;
+      }
+
+      .receipt {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+      }
+      .receipt-content {
+        padding: 20px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 20px;
+        border-bottom: 1px dashed #ddd;
+        padding-bottom: 15px;
+      }
+      .header h2 {
+        margin: 0 0 5px 0;
+        font-size: 20px;
+        color: #333;
+      }
+      .header p {
+        margin: 3px 0;
+        font-size: 11px;
+        color: #666;
+      }
+      .header .shop-name {
+        font-size: 16px;
+        font-weight: bold;
+        color: #667eea;
+      }
+
+      .receipt-info {
+        margin-bottom: 15px;
+        font-size: 11px;
+        border-bottom: 1px dashed #ddd;
+        padding-bottom: 10px;
+      }
+      .receipt-info p {
+        margin: 3px 0;
+      }
+      .receipt-info .label {
+        font-weight: bold;
+      }
+
+      .items-table {
+        width: 100%;
+        margin: 15px 0;
+        font-size: 11px;
+        border-collapse: collapse;
+      }
+      .items-table th,
+      .items-table td {
+        padding: 6px 0;
+        text-align: left;
+        border-bottom: 1px dotted #eee;
+      }
+      .items-table th {
+        border-bottom: 1px solid #333;
+        font-weight: bold;
+      }
+      .items-table td:last-child,
+      .items-table th:last-child {
+        text-align: right;
+      }
+      .items-table td:first-child,
+      .items-table th:first-child {
+        text-align: left;
+      }
+
+      .totals {
+        margin: 15px 0;
+        padding-top: 10px;
+        border-top: 1px dashed #ddd;
+      }
+      .totals .total-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 5px 0;
+        font-size: 12px;
+      }
+      .totals .grand-total {
+        font-weight: bold;
+        font-size: 14px;
+        border-top: 1px solid #333;
+        padding-top: 8px;
+        margin-top: 5px;
+      }
+
+      .footer {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px dashed #ddd;
+        font-size: 10px;
+        color: #666;
+      }
+      .footer p {
+        margin: 3px 0;
+      }
+
+      .signature {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px dashed #ddd;
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+      }
+      .signature div {
+        text-align: center;
+      }
+      .signature .line {
+        width: 120px;
+        border-top: 1px solid #333;
+        margin-top: 20px;
+        padding-top: 5px;
+      }
+
+      /* Success banner */
+      .success-banner {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-top: 15px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+      }
+      .success-banner .timer {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 16px;
+      }
+      .success-banner .btn-close {
+        background: white;
+        color: #28a745;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 13px;
+      }
+      .success-banner .btn-close:hover {
+        background: #f8f9fa;
+      }
+
+      @media (max-width: 400px) {
+        body {
+          padding: 10px;
+        }
+        .success-banner {
+          flex-direction: column;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="receipt-container">
+      <div class="receipt">
+        <div class="receipt-content">
+          <div class="header">
+            <div class="shop-name">🏥 CITY PHARMACY</div>
+            <p>123 Healthcare Street, Medical District</p>
+            <p>📞 +91 12345 67890 | 📧 pharmacy@example.com</p>
+            <p>GSTIN: 27AAAAA1234A1Z</p>
+          </div>
+
+          <div class="receipt-info">
+            <p><span class="label">Receipt #:</span> <%= sale.id %></p>
+            <p>
+              <span class="label">Date:</span> <%= new
+              Date(sale.completed_at).toLocaleString() %>
+            </p>
+            <p><span class="label">Customer ID:</span> WALK-IN</p>
+          </div>
+
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for(var i = 0; i < items.length; i++) { var item = items[i]; %>
+              <tr>
+                <td>
+                  <%= item.medicine_name %>
+                  <div style="font-size: 9px; color: #666">
+                    Batch: <%= item.batch_no %>
+                  </div>
+                </td>
+                <td><%= item.quantity %></td>
+                <td>₹<%= parseFloat(item.selling_price).toFixed(2) %></td>
+                <td>₹<%= parseFloat(item.subtotal).toFixed(2) %></td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+
+          <div class="totals">
+            <div class="total-row">
+              <span>Subtotal:</span
+              ><span>₹<%= parseFloat(sale.total_amount).toFixed(2) %></span>
+            </div>
+            <div class="total-row">
+              <span>Discount:</span><span>₹0.00</span>
+            </div>
+            <div class="total-row">
+              <span>Tax (GST):</span><span>₹0.00</span>
+            </div>
+            <div class="total-row grand-total">
+              <span>TOTAL:</span
+              ><span>₹<%= parseFloat(sale.total_amount).toFixed(2) %></span>
+            </div>
+          </div>
+
+          <div
+            class="receipt-info"
+            style="border-top: 1px dashed #ddd; padding-top: 10px"
+          >
+            <p><span class="label">Payment Mode:</span> CASH</p>
+            <p>
+              <span class="label">Amount Paid:</span> ₹<%=
+              parseFloat(sale.total_amount).toFixed(2) %>
+            </p>
+            <p><span class="label">Balance Due:</span> ₹0.00</p>
+          </div>
+
+          <div class="footer">
+            <p>*** Thank you for your purchase ***</p>
+            <p>Medicines sold cannot be returned or exchanged</p>
+            <p>For queries, please contact within 7 days</p>
+            <p>Follow us on social media @citypharmacy</p>
+          </div>
+
+          <div class="signature">
+            <div>
+              <div class="line"></div>
+              <div>Pharmacist</div>
+            </div>
+            <div>
+              <div class="line"></div>
+              <div>Cashier</div>
+            </div>
+          </div>
+
+          <div
+            style="
+              text-align: center;
+              margin-top: 15px;
+              font-size: 9px;
+              color: #999;
+            "
+          >
+            <p>Powered by Pharmacy Management System</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Success Banner -->
+      <div class="success-banner no-print">
+        <span>✅ Payment completed successfully!</span>
+        <div style="display: flex; gap: 10px; align-items: center">
+          <button class="btn-close" onclick="closeAndRedirect()">Close</button>
+          <span class="timer"
+            >Redirecting in <span id="countdown">3</span>s</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <script>
+      var seconds = 3;
+      var countdownElement = document.getElementById('countdown');
+      var timer;
+
+      function startCountdown() {
+          timer = setInterval(function() {
+              seconds--;
+              if (countdownElement) {
+                  countdownElement.innerText = seconds;
+              }
+              if (seconds <= 0) {
+                  clearInterval(timer);
+                  redirectToPharmacist();
+              }
+          }, 1000);
+      }
+
+      function redirectToPharmacist() {
+          <% if (user.role === 'pharmacist' || user.role === 'admin' || user.role === 'owner') { %>
+              window.location.href = '/pos/pharmacist';
+          <% } else { %>
+              window.location.href = '/pos/cashier';
+          <% } %>
+      }
+
+      function closeAndRedirect() {
+          if (timer) {
+              clearInterval(timer);
+          }
+          redirectToPharmacist();
+      }
+
+      // Start countdown
+      startCountdown();
+    </script>
+  </body>
+</html>

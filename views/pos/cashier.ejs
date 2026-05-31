@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cashier Dashboard - Pharmacy POS</title>
+    <!-- Modern Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #0f766e;
+        --primary-light: #14b8a6;
+        --accent: #6366f1;
+        --bg: #f8fafc;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --success: #10b981;
+        --error: #ef4444;
+        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--bg);
+        color: var(--text-main);
+        line-height: 1.5;
+        min-height: 100vh;
+        padding: 20px;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      /* Consistent Background Accents */
+      .bg-circle {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(80px);
+        z-index: -1;
+        opacity: 0.15;
+      }
+      .circle-1 {
+        width: 400px;
+        height: 400px;
+        background: var(--primary);
+        top: -100px;
+        left: -100px;
+      }
+      .circle-2 {
+        width: 300px;
+        height: 300px;
+        background: var(--accent);
+        bottom: -50px;
+        right: -50px;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      /* Header Styling */
+      .header {
+        background: white;
+        padding: 24px;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+      }
+
+      .header-left {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .header-info h1 {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .header-info p {
+        color: var(--text-muted);
+        font-size: 14px;
+      }
+
+      /* Logout Button Styling */
+      .logout-btn {
+        background: #fee2e2;
+        color: #dc2626;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
+        border: 1px solid #fecaca;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .logout-btn:hover {
+        background: #fecaca;
+        transform: translateY(-1px);
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .stats {
+        display: flex;
+        gap: 12px;
+      }
+
+      .stat-card {
+        background: #f1f5f9;
+        padding: 10px 16px;
+        border-radius: 12px;
+        text-align: center;
+        min-width: 120px;
+      }
+
+      .stat-number {
+        display: block;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--primary);
+      }
+
+      .stat-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+
+      /* Main Card Styling */
+      .card {
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+      }
+
+      .card h3 {
+        font-size: 18px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* Sale Item Row */
+      .sale-item {
+        background: #fff;
+        border: 1.5px solid #f1f5f9;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 16px;
+        transition: all 0.2s ease;
+      }
+
+      .sale-item:hover {
+        border-color: var(--primary-light);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+      }
+
+      .sale-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .sale-id {
+        font-weight: 700;
+        color: var(--text-main);
+        font-size: 15px;
+        background: #f1f5f9;
+        padding: 4px 10px;
+        border-radius: 6px;
+      }
+
+      .sale-date {
+        color: var(--text-muted);
+        font-size: 13px;
+        display: block;
+        margin-top: 4px;
+      }
+
+      .sale-total {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--success);
+      }
+
+      .sale-items-box {
+        font-size: 14px;
+        color: var(--text-main);
+        margin: 15px 0;
+        padding: 12px;
+        background: #f8fafc;
+        border-radius: 10px;
+        border-left: 4px solid var(--primary-light);
+      }
+
+      /* Buttons */
+      .btn-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .btn {
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .btn-view {
+        background: #f1f5f9;
+        color: var(--text-main);
+      }
+      .btn-view:hover {
+        background: #e2e8f0;
+      }
+
+      .btn-confirm {
+        background: var(--primary);
+        color: white;
+      }
+      .btn-confirm:hover {
+        background: var(--primary-light);
+        box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+      }
+
+      /* Alerts */
+      .alert {
+        padding: 14px 18px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        border-left: 5px solid;
+      }
+      .alert-success {
+        background: #ecfdf5;
+        color: #065f46;
+        border-color: #10b981;
+      }
+      .alert-error {
+        background: #fef2f2;
+        color: #991b1b;
+        border-color: #ef4444;
+      }
+
+      /* Modal Styling */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        padding: 20px;
+      }
+
+      .modal-content {
+        background: white;
+        margin: 40px auto;
+        padding: 30px;
+        border-radius: 24px;
+        width: 100%;
+        max-width: 700px;
+        max-height: 85vh;
+        overflow-y: auto;
+        position: relative;
+        animation: modalSlide 0.3s ease-out;
+      }
+
+      @keyframes modalSlide {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .close {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        font-size: 24px;
+        cursor: pointer;
+        color: var(--text-muted);
+      }
+
+      .modal-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-size: 14px;
+      }
+
+      .modal-table th {
+        text-align: left;
+        background: #f8fafc;
+        padding: 12px;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+      .modal-table td {
+        padding: 12px;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      /* Responsive Adjustments */
+      @media (max-width: 768px) {
+        .header {
+          flex-direction: column;
+          text-align: center;
+        }
+        .header-right {
+          flex-direction: column;
+          width: 100%;
+        }
+        .stats {
+          width: 100%;
+          justify-content: center;
+        }
+        .sale-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .btn-group {
+          flex-direction: column;
+        }
+        .btn {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-circle circle-1"></div>
+    <div class="bg-circle circle-2"></div>
+
+    <div class="container">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-left">
+          <div class="header-info">
+            <h1><span>💰</span> Cashier Portal</h1>
+            <p>Welcome, <strong><%= user.name %></strong> | <%= user.role %></p>
+          </div>
+          <!-- Logout Form Added Here -->
+          <form action="/auth/logout" method="GET" style="margin: 0">
+            <button type="submit" class="logout-btn">🚪 Logout</button>
+          </form>
+        </div>
+
+        <div class="header-right">
+          <div class="stats">
+            <div class="stat-card">
+              <span class="stat-number"
+                ><%= pendingSales ? pendingSales.length : 0 %></span
+              >
+              <span class="stat-label">Pending</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number"
+                >₹<%= todaySales ? todaySales.revenue.toLocaleString() : 0
+                %></span
+              >
+              <span class="stat-label">Today's Total</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Feedback Messages -->
+      <% if (success_msg && success_msg.length > 0) { %>
+      <div class="alert alert-success">✅ <%= success_msg %></div>
+      <% } %> <% if (error_msg && error_msg.length > 0) { %>
+      <div class="alert alert-error">⚠️ <%= error_msg %></div>
+      <% } %>
+
+      <!-- Pending Sales List -->
+      <main class="card">
+        <h3>📋 Ready for Payment</h3>
+
+        <% if (!pendingSales || pendingSales.length === 0) { %>
+        <div style="text-align: center; padding: 60px 20px">
+          <span style="font-size: 48px; display: block; margin-bottom: 10px"
+            >✨</span
+          >
+          <p style="font-weight: 600">All caught up!</p>
+          <p style="color: var(--text-muted); font-size: 13px">
+            Waiting for pharmacist to send new sales...
+          </p>
+        </div>
+        <% } else { %> <% for(var i = 0; i < pendingSales.length; i++) { var
+        sale = pendingSales[i]; %>
+        <div class="sale-item">
+          <div class="sale-header">
+            <div>
+              <span class="sale-id">ID: #<%= sale.id %></span>
+              <span class="sale-date"
+                >🕒 <%= new Date(sale.created_at).toLocaleString() %></span
+              >
+            </div>
+            <div class="sale-total">
+              ₹<%= parseFloat(sale.total_amount).toLocaleString() %>
+            </div>
+          </div>
+
+          <div class="sale-items-box">
+            <strong>Order Summary:</strong> <%= sale.items_summary || 'No items'
+            %>
+          </div>
+
+          <div class="btn-group">
+            <button
+              class="btn btn-view"
+              onclick="viewSaleDetails(<%= sale.id %>)"
+            >
+              🔍 View Breakdown
+            </button>
+            <button
+              class="btn btn-confirm"
+              onclick="confirmPayment(<%= sale.id %>)"
+            >
+              ✅ Confirm & Print
+            </button>
+          </div>
+        </div>
+        <% } %> <% } %>
+      </main>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="saleModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3 style="border: none">Sale Breakdown</h3>
+        <div id="saleDetails"></div>
+      </div>
+    </div>
+
+    <script>
+      function viewSaleDetails(saleId) {
+        fetch("/pos/details/" + saleId)
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+            var itemsHtml =
+              '<table class="modal-table"><thead><tr><th>Medicine</th><th>Batch</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr></thead><tbody>';
+            for (var i = 0; i < data.items.length; i++) {
+              var item = data.items[i];
+              itemsHtml +=
+                "<tr>" +
+                "<td>" +
+                item.medicine_name +
+                " (" +
+                item.unit +
+                ")</td>" +
+                "<td>" +
+                item.batch_no +
+                "</td>" +
+                "<td>" +
+                item.quantity +
+                "</td>" +
+                "<td>₹" +
+                parseFloat(item.selling_price).toFixed(2) +
+                "</td>" +
+                "<td>₹" +
+                parseFloat(item.subtotal).toFixed(2) +
+                "</td>" +
+                "</tr>";
+            }
+            itemsHtml += "</tbody></table>";
+
+            document.getElementById("saleDetails").innerHTML =
+              '<div style="background:#f8fafc; padding:20px; border-radius:12px; margin-bottom:20px; border:1px solid #e2e8f0;">' +
+              "<p style='margin-bottom:8px;'><strong>Transaction ID:</strong> #" +
+              data.sale.id +
+              "</p>" +
+              "<p style='margin-bottom:8px;'><strong>Pharmacist:</strong> " +
+              data.sale.pharmacist_name +
+              "</p>" +
+              "<p style='margin-bottom:8px;'><strong>Time:</strong> " +
+              new Date(data.sale.created_at).toLocaleString() +
+              "</p>" +
+              "<hr style='margin:12px 0; border:none; border-top:1px solid #e2e8f0;'>" +
+              "<p style='font-size:18px; color:#10b981;'><strong>Grand Total:</strong> ₹" +
+              parseFloat(data.sale.total_amount).toFixed(2) +
+              "</p>" +
+              "</div>" +
+              "<h4 style='margin-bottom:10px;'>Medicine List</h4>" +
+              itemsHtml;
+            document.getElementById("saleModal").style.display = "block";
+          })
+          .catch(function (error) {
+            console.error("Error:", error);
+            alert("Could not load details");
+          });
+      }
+
+      function confirmPayment(saleId) {
+        if (confirm("Process payment and deduct stock for this order?")) {
+          var form = document.createElement("form");
+          form.method = "POST";
+          form.action = "/pos/confirm-payment/" + saleId;
+          document.body.appendChild(form);
+          form.submit();
+        }
+      }
+
+      function closeModal() {
+        document.getElementById("saleModal").style.display = "none";
+      }
+
+      window.onclick = function (event) {
+        var modal = document.getElementById("saleModal");
+        if (event.target == modal) {
+          closeModal();
+        }
+      };
+    </script>
+  </body>
+</html>

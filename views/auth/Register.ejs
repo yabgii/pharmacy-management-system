@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Register - Pharmacy Management System</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        top: -100px;
+        right: -100px;
+      }
+
+      body::after {
+        content: "";
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        bottom: -200px;
+        left: -200px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        width: 100%;
+        max-width: 500px;
+        position: relative;
+        z-index: 1;
+        animation: slideUp 0.5s ease-out;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        padding: 30px;
+        text-align: center;
+        border-radius: 20px 20px 0 0;
+        color: white;
+      }
+
+      .header h1 {
+        font-size: 28px;
+        margin-bottom: 5px;
+      }
+
+      .header p {
+        opacity: 0.9;
+        font-size: 14px;
+      }
+
+      .form-container {
+        padding: 35px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .input-group {
+        position: relative;
+      }
+
+      .input-group span {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px 15px 12px 45px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.3s;
+        font-family: inherit;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: #28a745;
+        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+      }
+
+      button {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 12px 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border-left: 4px solid #dc3545;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .login-link {
+        text-align: center;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+        color: #666;
+        font-size: 14px;
+      }
+
+      .login-link a {
+        color: #28a745;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .login-link a:hover {
+        text-decoration: underline;
+      }
+
+      .info-note {
+        background: #e3f2fd;
+        color: #1565c0;
+        padding: 12px 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        font-size: 13px;
+        border-left: 4px solid #2196f3;
+      }
+
+      @media (max-width: 480px) {
+        .form-container {
+          padding: 25px;
+        }
+        .header {
+          padding: 25px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🏥 Create Owner Account</h1>
+        <p>Set up your pharmacy management system</p>
+      </div>
+
+      <div class="form-container">
+        <% if (error) { %>
+        <div class="alert-error"><span>❌</span> <%= error %></div>
+        <% } %>
+
+        <div class="info-note">
+          ℹ️ This will create the <strong>OWNER</strong> account. Only one owner
+          account can exist.
+        </div>
+
+        <form action="/auth/register" method="POST">
+          <div class="form-group">
+            <label>Full Name</label>
+            <div class="input-group">
+              <span>👤</span>
+              <input
+                type="text"
+                name="name"
+                placeholder="Enter your full name"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Email Address</label>
+            <div class="input-group">
+              <span>📧</span>
+              <input
+                type="email"
+                name="email"
+                placeholder="owner@pharmacy.com"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Username</label>
+            <div class="input-group">
+              <span>🔑</span>
+              <input
+                type="text"
+                name="username"
+                placeholder="Choose a username"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-group">
+              <span>🔒</span>
+              <input
+                type="password"
+                name="password"
+                placeholder="Create a strong password"
+                required
+              />
+            </div>
+          </div>
+
+          <button type="submit">Create Owner Account →</button>
+        </form>
+
+        <div class="login-link">
+          Already have an account? <a href="/auth/login">Login here</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

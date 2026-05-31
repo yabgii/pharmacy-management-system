@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Supplier Batches</title>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f4f4f4;
+        padding: 20px;
+      }
+      .container {
+        max-width: 1300px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+      }
+      h2 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+      .supplier-info {
+        background: #e8f5e9;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        border-left: 4px solid #28a745;
+      }
+      .supplier-info h3 {
+        margin: 0 0 5px 0;
+        color: #2e7d32;
+      }
+      .supplier-info p {
+        margin: 0;
+        color: #555;
+      }
+      .stats-summary {
+        display: flex;
+        gap: 15px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+      }
+      .stat-box {
+        background: #f8f9fa;
+        padding: 12px 20px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+      }
+      .stat-box label {
+        font-size: 12px;
+        color: #666;
+        display: block;
+      }
+      .stat-box value {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+      }
+      th {
+        background: #f2f2f2;
+        font-weight: 600;
+      }
+      tr:hover {
+        background: #f9f9f9;
+      }
+      .btn-back {
+        background: #6c757d;
+        color: white;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 5px;
+        display: inline-block;
+        margin-bottom: 15px;
+      }
+      .btn-back:hover {
+        background: #5a6268;
+      }
+      .badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 11px;
+      }
+      .badge-good {
+        background: #28a745;
+        color: white;
+      }
+      .badge-expired {
+        background: #dc3545;
+        color: white;
+      }
+      .text-right {
+        text-align: right;
+      }
+      .total-row {
+        background: #f2f2f2;
+        font-weight: bold;
+      }
+      .total-row td {
+        border-top: 2px solid #ddd;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>📦 Batches from Supplier</h2>
+
+      <a href="/suppliers" class="btn-back">← Back to Suppliers</a>
+
+      <% if (batches && batches.length > 0) { const supplierName =
+      batches[0].supplier_name; const totalBatches = batches.length; const
+      totalQuantity = batches.reduce((sum, b) => sum + b.quantity, 0); const
+      totalCost = batches.reduce((sum, b) => sum + (b.quantity * b.cost_price),
+      0); %>
+      <div class="supplier-info">
+        <h3><%= supplierName %></h3>
+        <p>Viewing all batches received from this supplier</p>
+      </div>
+
+      <div class="stats-summary">
+        <div class="stat-box">
+          <label>Total Batches</label>
+          <value><%= totalBatches %></value>
+        </div>
+        <div class="stat-box">
+          <label>Total Quantity</label>
+          <value><%= totalQuantity %></value>
+        </div>
+        <div class="stat-box">
+          <label>Total Investment</label>
+          <value>₹<%= totalCost.toLocaleString() %></value>
+        </div>
+      </div>
+      <% } %>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Medicine</th>
+            <th>Batch No</th>
+            <th>Quantity</th>
+            <th>Unit Cost (Purchase)</th>
+            <th>Selling Price</th>
+            <th>Total Cost for Batch</th>
+
+            <th>Date Received</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!batches || batches.length === 0) { %>
+          <tr>
+            <td colspan="9" style="text-align: center">
+              No batches found from this supplier.
+            </td>
+          </tr>
+          <% } else { let grandTotalQuantity = 0; let grandTotalCost = 0; %> <%
+          batches.forEach(function(batch) { const isExpired = new
+          Date(batch.expiry_date) < new Date(); const totalBatchCost =
+          batch.quantity * batch.cost_price; grandTotalQuantity +=
+          batch.quantity; grandTotalCost += totalBatchCost; %>
+          <tr>
+            <td>
+              <strong><%= batch.medicine_name %></strong> (<%= batch.unit %>)
+            </td>
+            <td><%= batch.batch_no %></td>
+            <td><%= batch.quantity %></td>
+            <td class="text-right">
+              ₹<%= parseFloat(batch.cost_price).toFixed(2) %>
+            </td>
+
+            <td>₹<%= parseFloat(batch.selling_price).toFixed(2) %></td>
+            <td class="text-right">₹<%= totalBatchCost.toLocaleString() %></td>
+            <td><%= new Date(batch.created_at).toLocaleDateString() %></td>
+          </tr>
+          <% }) %> <% if (batches.length > 0) { %>
+          <tr class="total-row">
+            <td colspan="2"><strong>TOTAL</strong></td>
+            <td><strong><%= grandTotalQuantity %></strong></td>
+            <td class="text-right">-</td>
+            <td class="text-right">
+              <strong>₹<%= grandTotalCost.toLocaleString() %></strong>
+            </td>
+            <td colspan="4"></td>
+          </tr>
+          <% } %> <% } %>
+        </tbody>
+      </table>
+
+      <% if (batches && batches.length > 0) { %>
+      <div
+        style="
+          margin-top: 20px;
+          padding: 15px;
+          background: #e3f2fd;
+          border-radius: 8px;
+        "
+      >
+        <h4>📊 Summary</h4>
+        <p style="margin: 5px 0">
+          Total money spent with this supplier:
+          <strong
+            >₹<%= batches.reduce((sum, b) => sum + (b.quantity * b.cost_price),
+            0).toLocaleString() %></strong
+          >
+        </p>
+        <p style="margin: 5px 0">
+          Total units purchased:
+          <strong
+            ><%= batches.reduce((sum, b) => sum + b.quantity, 0) %></strong
+          >
+        </p>
+        <p style="margin: 5px 0">
+          Average cost per unit:
+          <strong
+            >₹<%= (batches.reduce((sum, b) => sum + (b.quantity * b.cost_price),
+            0) / batches.reduce((sum, b) => sum + b.quantity, 0)).toFixed(2)
+            %></strong
+          >
+        </p>
+      </div>
+      <% } %>
+    </div>
+  </body>
+</html>

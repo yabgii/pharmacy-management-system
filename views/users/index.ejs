@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Users</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; padding: 20px; }
+        .container { max-width: 1300px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+        h2 { color: #333; margin-bottom: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        
+        .stats { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .stat-card { flex: 1; padding: 15px; border-radius: 8px; color: white; text-align: center; }
+        .stat-card h3 { font-size: 24px; }
+        .stat-total { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .stat-admins { background: linear-gradient(135deg, #17a2b8, #138496); }
+        .stat-sellers { background: linear-gradient(135deg, #28a745, #20c997); }
+        .stat-active { background: linear-gradient(135deg, #28a745, #218838); }
+        .stat-inactive { background: linear-gradient(135deg, #dc3545, #c82333); }
+        
+        .btn-add { background: #28a745; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block; margin-bottom: 15px; }
+        
+        .filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .search-box { flex: 2; display: flex; gap: 10px; }
+        .search-box input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .search-box button { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .filter-group { display: flex; gap: 5px; }
+        .filter-btn { padding: 8px 15px; background: #6c757d; color: white; text-decoration: none; border-radius: 5px; font-size: 14px; }
+        .filter-btn.active { background: #28a745; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #f2f2f2; font-weight: 600; }
+        tr:hover { background: #f9f9f9; }
+        
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+        .badge-active { background: #28a745; color: white; }
+        .badge-inactive { background: #dc3545; color: white; }
+        .badge-admin { background: #17a2b8; color: white; }
+        .badge-seller { background: #ffc107; color: #333; }
+        
+        .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 3px; text-decoration: none; margin: 2px; display: inline-block; cursor: pointer; }
+        .btn-edit { background: #ffc107; color: #333; border: none; }
+        .btn-delete { background: #dc3545; color: white; border: none; }
+        .btn-view { background: #17a2b8; color: white; border: none; }
+        .btn-status { background: #6c757d; color: white; border: none; }
+        .btn-status-active { background: #fd7e14; }
+        
+        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 5% auto; padding: 25px; border-radius: 10px; width: 90%; max-width: 500px; }
+        .close { float: right; font-size: 28px; cursor: pointer; color: #aaa; }
+        .close:hover { color: #000; }
+        
+        .alert-success { background: #d4edda; color: #155724; padding: 12px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #28a745; }
+        .alert-error { background: #f8d7da; color: #721c24; padding: 12px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>👥 User Management</h2>
+        
+        <% if (success_msg && success_msg.length > 0) { %>
+            <div class="alert-success"><%= success_msg %></div>
+        <% } %>
+        <% if (error_msg && error_msg.length > 0) { %>
+            <div class="alert-error"><%= error_msg %></div>
+        <% } %>
+        
+        <a href="/users/create" class="btn-add">+ Add New User</a>
+        
+        <!-- Statistics Cards -->
+        <div class="stats">
+            <div class="stat-card stat-total"><h3><%= stats.total_users || 0 %></h3><p>Total Users</p></div>
+            <div class="stat-card stat-admins"><h3><%= stats.total_admins || 0 %></h3><p>Admins</p></div>
+            <div class="stat-card stat-sellers"><h3><%= stats.total_sellers || 0 %></h3><p>Sellers</p></div>
+            <div class="stat-card stat-active"><h3><%= stats.active_users || 0 %></h3><p>Active</p></div>
+            <div class="stat-card stat-inactive"><h3><%= stats.inactive_users || 0 %></h3><p>Inactive</p></div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="filters">
+            <form method="GET" action="/users" class="search-box">
+                <input type="text" name="search" placeholder="Search by name, username, email..." value="<%= search %>" />
+                <button type="submit">Search</button>
+                <% if (search) { %>
+                    <a href="/users" style="padding: 10px;">Clear</a>
+                <% } %>
+            </form>
+            <div class="filter-group">
+                <a href="/users" class="filter-btn <%= !role && !status ? 'active' : '' %>">All</a>
+                <a href="/users?role=admin" class="filter-btn <%= role === 'admin' ? 'active' : '' %>">Admins</a>
+                <a href="/users?role=seller" class="filter-btn <%= role === 'seller' ? 'active' : '' %>">Sellers</a>
+                <a href="/users?status=active" class="filter-btn <%= status === 'active' ? 'active' : '' %>">Active</a>
+                <a href="/users?status=inactive" class="filter-btn <%= status === 'inactive' ? 'active' : '' %>">Inactive</a>
+            </div>
+        </div>
+        
+        <!-- Users Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (!users || users.length === 0) { %>
+                <tr><td colspan="7" style="text-align: center;">No users found. <a href="/users/create">Add your first user</a></td></tr>
+                <% } else { %>
+                    <% users.forEach(function(user) { %>
+                    <tr>
+                        <td><strong><%= user.name %></strong></td>
+                        <td><%= user.username %></td>
+                        <td><%= user.email %></td>
+                        <td>
+                            <span class="badge <%= user.role === 'admin' ? 'badge-admin' : 'badge-seller' %>">
+                                <%= user.role === 'admin' ? 'Admin' : 'Seller' %>
+                            </span>
+                         </td>
+                        <td>
+                            <span class="badge <%= user.status === 'active' ? 'badge-active' : 'badge-inactive' %>">
+                                <%= user.status === 'active' ? 'Active' : 'Inactive' %>
+                            </span>
+                         </td>
+                        <td><%= new Date(user.created_at).toLocaleDateString() %> </td>
+                        <td>
+                            <button class="btn-sm btn-view" onclick="viewUserDetails(<%= user.id %>)">View</button>
+                            <a href="/users/edit/<%= user.id %>" class="btn-sm btn-edit">Edit</a>
+                            <form action="/users/toggle-status/<%= user.id %>" method="POST" style="display:inline">
+                                <button type="submit" class="btn-sm btn-status <%= user.status === 'active' ? 'btn-status' : 'btn-status-active' %>" onclick="return confirm('Change status for this user?')">
+                                    <%= user.status === 'active' ? 'Deactivate' : 'Activate' %>
+                                </button>
+                            </form>
+                            <form action="/users/delete/<%= user.id %>" method="POST" style="display:inline">
+                                <button type="submit" class="btn-sm btn-delete" onclick="return confirm('Delete this user? This action cannot be undone.')">Delete</button>
+                            </form>
+                         </td>
+                     </tr>
+                    <% }) %>
+                <% } %>
+            </tbody>
+         </table>
+    </div>
+    
+    <!-- User Details Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>User Details</h3>
+            <div id="userDetails"></div>
+        </div>
+    </div>
+    
+    <script>
+        function viewUserDetails(id) {
+            fetch(`/users/details/${id}`)
+                .then(res => res.json())
+                .then(user => {
+                    document.getElementById('userDetails').innerHTML = `
+                        <table style="width:100%">
+                            <tr><td><strong>Name:</strong></td><td>${user.name}</td></tr>
+                            <tr><td><strong>Username:</strong></td><td>${user.username}</td></tr>
+                            <tr><td><strong>Email:</strong></td><td>${user.email}</td></tr>
+                            <tr><td><strong>Role:</strong></td><td><span class="badge ${user.role === 'admin' ? 'badge-admin' : 'badge-seller'}">${user.role === 'admin' ? 'Admin' : 'Seller'}</span></td></tr>
+                            <tr><td><strong>Status:</strong></td><td><span class="badge ${user.status === 'active' ? 'badge-active' : 'badge-inactive'}">${user.status === 'active' ? 'Active' : 'Inactive'}</span></td></tr>
+                            <tr><td><strong>Joined:</strong></td><td>${new Date(user.created_at).toLocaleString()}</td></tr>
+                        </table>
+                    `;
+                    document.getElementById('userModal').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Could not load user details');
+                });
+        }
+        
+        function closeModal() {
+            document.getElementById('userModal').style.display = 'none';
+        }
+        
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('userModal')) closeModal();
+        }
+    </script>
+</body>
+</html>

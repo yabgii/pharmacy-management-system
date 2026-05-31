@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Medicine - Pharmacy Management</title>
+    <!-- Modern Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-light: #14b8a6;
+            --accent: #6366f1;
+            --bg: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --border: #e2e8f0;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding: 20px;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Background Accents */
+        .bg-circle {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.1;
+        }
+        .circle-1 { width: 400px; height: 400px; background: var(--primary); top: -100px; left: -100px; }
+        .circle-2 { width: 300px; height: 300px; background: var(--accent); bottom: -50px; right: -50px; }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            padding: 35px;
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 15px;
+        }
+
+        h3 {
+            color: var(--text-main);
+            margin: 30px 0 20px;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3::before {
+            content: "";
+            width: 4px;
+            height: 18px;
+            background: var(--primary-light);
+            border-radius: 10px;
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 14px;
+            background: #f8fafc;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-update { background: var(--primary); color: white; }
+        .btn-update:hover { background: var(--primary-light); transform: translateY(-1px); }
+
+        .btn-cancel { background: #f1f5f9; color: var(--text-main); }
+        .btn-cancel:hover { background: #e2e8f0; }
+
+        .btn-add-batch { background: var(--success); color: white; margin-bottom: 20px; }
+        .btn-add-batch:hover { background: #059669; }
+
+        .btn-edit-batch { background: #fef3c7; color: #92400e; font-size: 12px; padding: 6px 12px; }
+        .btn-delete-batch { background: #fee2e2; color: #b91c1c; font-size: 12px; padding: 6px 12px; }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        /* Table Design */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            background: white;
+        }
+
+        th {
+            background: #f8fafc;
+            padding: 14px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 14px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        /* Batch Status Colors */
+        .expired { background-color: #fef2f2; }
+        .expiring-soon { background-color: #fffbeb; }
+        .stock-low { background-color: #fff7ed; }
+
+        /* Badges */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .badge-expiring { background: #fef3c7; color: #92400e; }
+        .badge-early { background: #ffedd5; color: #9a3412; }
+        .badge-expired { background: #fee2e2; color: #991b1b; }
+        .badge-low { background: #ffedd5; color: #c2410c; }
+
+        /* Modal Design */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalSlide 0.3s ease-out;
+        }
+
+        @keyframes modalSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            border-left: 5px solid;
+        }
+        .alert-success { background: #ecfdf5; color: #065f46; border-color: #10b981; }
+        .alert-error { background: #fef2f2; color: #991b1b; border-color: #ef4444; }
+
+        hr { border: none; border-top: 2px solid #f1f5f9; margin: 30px 0; }
+
+        @media (max-width: 768px) {
+            .container { padding: 20px; }
+            .button-group { flex-direction: column; }
+            .btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-circle circle-1"></div>
+    <div class="bg-circle circle-2"></div>
+
+    <div class="container">
+        <h2>✏️ Edit Medicine & Batches</h2>
+
+         
+
+        <!-- MEDICINE EDIT FORM -->
+        <h3>📋 Medicine Information</h3>
+        <form action="/medicines/edit/<%= medicine.id %>" method="POST">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Medicine Name *</label>
+                    <input type="text" name="name" value="<%= medicine.name %>" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Generic Name</label>
+                    <input type="text" name="generic_name" value="<%= medicine.generic_name || '' %>" />
+                </div>
+
+                <div class="form-group">
+                    <label>Category</label>
+                    <input type="text" name="category" value="<%= medicine.category || '' %>" />
+                </div>
+
+                <div class="form-group">
+                    <label>Unit *</label>
+                    <input type="text" name="unit" value="<%= medicine.unit %>" placeholder="e.g., tablet, bottle" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Manufacturer</label>
+                    <select name="manufacturer_id">
+                        <option value="">-- Select Manufacturer --</option>
+                        <% manufacturers.forEach(m => { %>
+                            <option value="<%= m.id %>" <%= medicine.manufacturer_id == m.id ? 'selected' : '' %>>
+                                <%= m.name %>
+                            </option>
+                        <% }) %>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Minimum Stock Level *</label>
+                    <input type="number" name="min_stock_level" value="<%= medicine.min_stock_level %>" required />
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-update">💾 Update Medicine Info</button>
+                <a href="/medicines" class="btn btn-cancel">← Back to Inventory</a>
+            </div>
+        </form>
+
+        <hr />
+
+        <!-- BATCH MANAGEMENT -->
+        <h3>📦 Batches & Stock Management</h3>
+        
+        <button class="btn btn-add-batch" onclick="openAddBatchModal()">+ Add New Batch</button>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Batch No</th>
+                        <th>Supplier</th>
+                        <th>Quantity</th>
+                        <th>Cost</th>
+                        <th>Retail</th>
+                        <th>Mfg Date</th>
+                        <th>Expiry</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (batches && batches.length > 0) { %>
+                        <% batches.forEach(batch => { 
+                            const today = new Date();
+                            const expiryDate = new Date(batch.expiry_date);
+                            const daysToExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+                            let statusClass = '';
+                            let statusText = '';
+                            
+                            if (daysToExpiry < 0) {
+                                statusClass = 'expired';
+                                statusText = '<span class="badge badge-expired">Expired</span>';
+                            }
+                            else if (daysToExpiry <= 30) {
+                                statusClass = 'expiring-soon';
+                                statusText = '<span class="badge badge-expiring">Exp: ' + daysToExpiry + 'd</span>';
+                            } 
+                            else if (daysToExpiry <= 90) {
+                                statusClass = 'expiring-soon';
+                                statusText = '<span class="badge badge-early">Exp: ' + daysToExpiry + 'd</span>';
+                            } else {
+                                statusText = '<span class="badge" style="background:#dcfce7; color:#166534;">Good</span>';
+                            }
+                            
+                            const isLowStock = batch.quantity <= (medicine.min_stock_level || 10);
+                            if (isLowStock && batch.quantity > 0) {
+                                statusClass = 'stock-low';
+                            }
+                        %>
+                        <tr class="<%= statusClass %>">
+                            <td><strong><%= batch.batch_no %></strong></td>
+                            <td><small><%= batch.supplier_name || '-' %></small></td>
+                            <td>
+                                <%= batch.quantity %>
+                                <% if (batch.quantity <= 0) { %>
+                                    <span class="badge badge-expired">Out of Stock</span>
+                                <% } else if (isLowStock && batch.quantity > 0) { %>
+                                    <span class="badge badge-low">Low</span>
+                                <% } %>
+                            </td>
+                            <td>₹<%= parseFloat(batch.cost_price).toFixed(2) %></td>
+                            <td>₹<%= parseFloat(batch.selling_price).toFixed(2) %></td>
+                            <td><small><%= batch.manufacture_date ? new Date(batch.manufacture_date).toLocaleDateString() : '-' %></small></td>
+                            <td><strong><%= new Date(batch.expiry_date).toLocaleDateString() %></strong></td>
+                            <td><%- statusText %></td>
+                            <td>
+                                <div style="display: flex; gap: 5px;">
+                                    <button class="btn btn-edit-batch" onclick='openEditBatchModal(<%= JSON.stringify(batch) %>)'>Edit</button>
+                                    <form action="/medicines/batch/delete/<%= batch.id %>" method="POST" style="display:inline" onsubmit="return confirm('Delete this batch?')">
+                                        <button type="submit" class="btn btn-delete-batch">Del</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                                No batches found. Click "Add New Batch" to restock.
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD BATCH -->
+    <div id="addBatchModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddBatchModal()">&times;</span>
+            <h3 style="margin-top:0;">➕ Add New Batch</h3>
+            <form action="/medicines/batch/add/<%= medicine.id %>" method="POST">
+                <div class="form-group">
+                    <label>Batch Number *</label>
+                    <input type="text" name="batch_no" required placeholder="BN-2024-01" />
+                </div>
+                <div class="form-group">
+                    <label>Supplier</label>
+                    <select name="supplier_id">
+                        <option value="">-- Select Supplier --</option>
+                        <% suppliers.forEach(s => { %>
+                            <option value="<%= s.id %>"><%= s.name %></option>
+                        <% }) %>
+                    </select>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Quantity *</label>
+                        <input type="number" name="quantity" required min="0" />
+                    </div>
+                    <div class="form-group">
+                        <label>Cost Price *</label>
+                        <input type="number" step="0.01" name="cost_price" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Retail Selling Price *</label>
+                    <input type="number" step="0.01" name="selling_price" required />
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Mfg Date</label>
+                        <input type="date" name="manufacture_date" />
+                    </div>
+                    <div class="form-group">
+                        <label>Expiry Date *</label>
+                        <input type="date" name="expiry_date" required />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-update" style="width:100%; margin-top:10px;">Save New Batch</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT BATCH -->
+    <div id="editBatchModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditBatchModal()">&times;</span>
+            <h3 style="margin-top:0;">✏️ Edit Batch Details</h3>
+            <form id="editBatchForm" method="POST">
+                <div class="form-group">
+                    <label>Batch Number *</label>
+                    <input type="text" name="batch_no" id="edit_batch_no" required />
+                </div>
+                <div class="form-group">
+                    <label>Supplier</label>
+                    <select name="supplier_id" id="edit_supplier_id">
+                        <option value="">-- Select Supplier --</option>
+                        <% suppliers.forEach(s => { %>
+                            <option value="<%= s.id %>"><%= s.name %></option>
+                        <% }) %>
+                    </select>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Quantity *</label>
+                        <input type="number" name="quantity" id="edit_quantity" required min="0" />
+                    </div>
+                    <div class="form-group">
+                        <label>Cost Price *</label>
+                        <input type="number" step="0.01" name="cost_price" id="edit_cost_price" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Selling Price *</label>
+                    <input type="number" step="0.01" name="selling_price" id="edit_selling_price" required />
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Mfg Date</label>
+                        <input type="date" name="manufacture_date" id="edit_manufacture_date" />
+                    </div>
+                    <div class="form-group">
+                        <label>Expiry Date *</label>
+                        <input type="date" name="expiry_date" id="edit_expiry_date" required />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-update" style="width:100%; margin-top:10px;">Update Batch Information</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Modal Logic (Preserved)
+        function openAddBatchModal() {
+            document.getElementById('addBatchModal').style.display = 'flex';
+        }
+
+        function closeAddBatchModal() {
+            document.getElementById('addBatchModal').style.display = 'none';
+        }
+
+        function openEditBatchModal(batch) {
+            document.getElementById('editBatchForm').action = '/medicines/batch/edit/' + batch.id;
+            document.getElementById('edit_batch_no').value = batch.batch_no;
+            document.getElementById('edit_supplier_id').value = batch.supplier_id || '';
+            document.getElementById('edit_quantity').value = batch.quantity;
+            document.getElementById('edit_cost_price').value = batch.cost_price;
+            document.getElementById('edit_selling_price').value = batch.selling_price;
+            document.getElementById('edit_manufacture_date').value = batch.manufacture_date ? batch.manufacture_date.toString().split('T')[0] : '';
+            document.getElementById('edit_expiry_date').value = batch.expiry_date.toString().split('T')[0];
+            document.getElementById('editBatchModal').style.display = 'flex';
+        }
+
+        function closeEditBatchModal() {
+            document.getElementById('editBatchModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('addBatchModal')) closeAddBatchModal();
+            if (event.target == document.getElementById('editBatchModal')) closeEditBatchModal();
+        }
+    </script>
+</body>
+</html>

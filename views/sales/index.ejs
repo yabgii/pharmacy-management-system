@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sales Report - Pharmacy Management</title>
+    <!-- Modern Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #0f766e;
+        --primary-light: #14b8a6;
+        --accent: #6366f1;
+        --bg: #f8fafc;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --error: #ef4444;
+        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--bg);
+        color: var(--text-main);
+        line-height: 1.5;
+        padding: 20px;
+        position: relative;
+        min-height: 100vh;
+      }
+
+      /* Background Accents */
+      .bg-circle {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(80px);
+        z-index: -1;
+        opacity: 0.1;
+      }
+      .circle-1 {
+        width: 400px;
+        height: 400px;
+        background: var(--primary);
+        top: -100px;
+        left: -100px;
+      }
+      .circle-2 {
+        width: 300px;
+        height: 300px;
+        background: var(--accent);
+        bottom: -50px;
+        right: -50px;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      /* Header */
+      .header {
+        background: white;
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .header h2 {
+        color: var(--primary);
+        font-weight: 800;
+        font-size: 24px;
+      }
+      .date-range {
+        color: var(--text-muted);
+        font-size: 14px;
+        margin-top: 4px;
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      /* Buttons */
+      .btn {
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+      }
+      .btn-primary:hover {
+        background: var(--primary-light);
+      }
+
+      .btn-dashboard {
+        background: #f1f5f9;
+        color: var(--text-main);
+      }
+      .btn-dashboard:hover {
+        background: #e2e8f0;
+      }
+
+      .btn-export {
+        background: #e0f2fe;
+        color: #0369a1;
+      }
+      .btn-export:hover {
+        background: #bae6fd;
+      }
+
+      /* Period Tabs */
+      .period-buttons {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 10px;
+        margin-bottom: 24px;
+        scrollbar-width: none;
+      }
+      .period-buttons::-webkit-scrollbar {
+        display: none;
+      }
+
+      .period-btn {
+        padding: 8px 16px;
+        background: white;
+        color: var(--text-muted);
+        text-decoration: none;
+        border-radius: 50px;
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s;
+        border: 1px solid #f1f5f9;
+      }
+      .period-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
+
+      /* Custom Range Form */
+      .custom-range {
+        background: white;
+        padding: 20px;
+        border-radius: 20px;
+        margin-bottom: 24px;
+        box-shadow: var(--card-shadow);
+      }
+      .custom-range form {
+        display: flex;
+        gap: 15px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .form-group label {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+      }
+      .form-group input {
+        padding: 10px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        font-family: inherit;
+        background: #f8fafc;
+      }
+
+      /* Stats Cards */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        text-align: left;
+        border-left: 5px solid #e2e8f0;
+      }
+      .stat-card h3 {
+        font-size: 22px;
+        font-weight: 800;
+        margin-bottom: 4px;
+      }
+      .stat-card p {
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .stat-card.revenue {
+        border-color: var(--success);
+      }
+      .stat-card.profit {
+        border-color: var(--accent);
+      }
+      .stat-card.transactions {
+        border-color: var(--warning);
+      }
+      .stat-card.items {
+        border-color: var(--primary-light);
+      }
+
+      /* Charts/Tables Section */
+      .charts-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 24px;
+        margin-bottom: 24px;
+      }
+      .chart-card {
+        background: white;
+        padding: 24px;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+      }
+      .chart-card h3 {
+        margin-bottom: 20px;
+        color: var(--primary);
+        font-size: 16px;
+        font-weight: 700;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 12px;
+      }
+
+      /* Tables */
+      .table-container {
+        background: white;
+        padding: 24px;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 24px;
+        overflow-x: auto;
+      }
+      .table-container h3 {
+        margin-bottom: 20px;
+        color: var(--primary);
+        font-weight: 700;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      th {
+        background: #f8fafc;
+        padding: 12px;
+        text-align: left;
+        color: var(--text-muted);
+        font-weight: 700;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+      td {
+        padding: 12px;
+        border-bottom: 1px solid #f1f5f9;
+      }
+      tr:hover td {
+        background: #fcfdfe;
+      }
+
+      .profit-positive {
+        color: var(--success);
+        font-weight: 700;
+      }
+      .profit-negative {
+        color: var(--error);
+        font-weight: 700;
+      }
+
+      .view-details {
+        color: var(--primary);
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-size: 13px;
+      }
+      .view-details:hover {
+        text-decoration: underline;
+      }
+
+      /* Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        padding: 20px;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 24px;
+        width: 100%;
+        max-width: 800px;
+        max-height: 85vh;
+        overflow-y: auto;
+        position: relative;
+        animation: modalSlide 0.3s ease-out;
+      }
+      @keyframes modalSlide {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .close {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        font-size: 24px;
+        cursor: pointer;
+        color: var(--text-muted);
+      }
+
+      .text-center {
+        text-align: center;
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .header-actions {
+          width: 100%;
+        }
+        .btn {
+          flex: 1;
+          justify-content: center;
+        }
+        .stats-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .charts-section {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-circle circle-1"></div>
+    <div class="bg-circle circle-2"></div>
+
+    <div class="container">
+      <!-- Header -->
+      <header class="header">
+        <div>
+          <h2>💰 Sales Report</h2>
+          <div class="date-range"><%= dateRangeText %></div>
+        </div>
+        <div class="header-actions">
+          <a
+            href="/sales/export?period=<%= period %><%= startDate ? '&start_date=' + startDate : '' %><%= endDate ? '&end_date=' + endDate : '' %>"
+            class="btn btn-export"
+            >📥 Export CSV</a
+          >
+          <a href="/dashboard" class="btn btn-dashboard">← Back to Dashboard</a>
+        </div>
+      </header>
+
+      <!-- Period Selection -->
+      <div class="period-buttons">
+        <a
+          href="/sales?period=today"
+          class="period-btn <%= period === 'today' ? 'active' : '' %>"
+          >Today</a
+        >
+        <a
+          href="/sales?period=yesterday"
+          class="period-btn <%= period === 'yesterday' ? 'active' : '' %>"
+          >Yesterday</a
+        >
+        <a
+          href="/sales?period=week"
+          class="period-btn <%= period === 'week' ? 'active' : '' %>"
+          >This Week</a
+        >
+        <a
+          href="/sales?period=last_week"
+          class="period-btn <%= period === 'last_week' ? 'active' : '' %>"
+          >Last Week</a
+        >
+        <a
+          href="/sales?period=month"
+          class="period-btn <%= period === 'month' ? 'active' : '' %>"
+          >This Month</a
+        >
+        <a
+          href="/sales?period=last_month"
+          class="period-btn <%= period === 'last_month' ? 'active' : '' %>"
+          >Last Month</a
+        >
+        <a
+          href="/sales?period=year"
+          class="period-btn <%= period === 'year' ? 'active' : '' %>"
+          >This Year</a
+        >
+        <a
+          href="/sales?period=last_year"
+          class="period-btn <%= period === 'last_year' ? 'active' : '' %>"
+          >Last Year</a
+        >
+        <a
+          href="/sales?period=custom"
+          class="period-btn <%= period === 'custom' ? 'active' : '' %>"
+          >Custom Range</a
+        >
+      </div>
+
+      <!-- Custom Date Range -->
+      <% if (period === 'custom') { %>
+      <div class="custom-range">
+        <form method="GET" action="/sales">
+          <input type="hidden" name="period" value="custom" />
+          <div class="form-group">
+            <label>Start Date</label>
+            <input
+              type="date"
+              name="start_date"
+              value="<%= startDate %>"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>End Date</label>
+            <input
+              type="date"
+              name="end_date"
+              value="<%= endDate %>"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Apply Filter</button>
+        </form>
+      </div>
+      <% } %>
+
+      <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card revenue">
+          <h3>
+            ₹<%= parseFloat(summary.total_revenue || 0).toLocaleString() %>
+          </h3>
+          <p>Total Revenue</p>
+        </div>
+        <div class="stat-card">
+          <h3>₹<%= parseFloat(summary.total_cost || 0).toLocaleString() %></h3>
+          <p>Total Cost</p>
+        </div>
+        <div class="stat-card profit">
+          <h3
+            class="<%= summary.total_profit >= 0 ? 'profit-positive' : 'profit-negative' %>"
+          >
+            ₹<%= parseFloat(summary.total_profit || 0).toLocaleString() %>
+          </h3>
+          <p>Total Profit</p>
+        </div>
+        <div class="stat-card transactions">
+          <h3><%= summary.total_transactions || 0 %></h3>
+          <p>Transactions</p>
+        </div>
+        <div class="stat-card items">
+          <h3><%= summary.total_items_sold || 0 %></h3>
+          <p>Items Sold</p>
+        </div>
+        <div class="stat-card">
+          <h3>
+            ₹<%= parseFloat(summary.avg_transaction_value || 0).toLocaleString()
+            %>
+          </h3>
+          <p>Avg Transaction</p>
+        </div>
+      </div>
+
+      <!-- Top Products & Seller Performance -->
+      <div class="charts-section">
+        <div class="chart-card">
+          <h3>🏆 Top Selling Medicines</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Medicine</th>
+                <th>Qty Sold</th>
+                <th>Revenue</th>
+                <th>Profit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (topProducts && topProducts.length > 0) { %> <%
+              topProducts.forEach(function(p) { %>
+              <tr>
+                <td>
+                  <small
+                    ><strong><%= p.name %></strong><br /><%= p.unit %></small
+                  >
+                </td>
+                <td><%= p.total_quantity_sold %></td>
+                <td>₹<%= parseFloat(p.total_revenue).toLocaleString() %></td>
+                <td class="profit-positive">
+                  ₹<%= parseFloat(p.total_profit).toLocaleString() %>
+                </td>
+              </tr>
+              <% }) %> <% } else { %>
+              <tr>
+                <td colspan="4" class="text-center">No data available</td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="chart-card">
+          <h3>👤 Seller Performance</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Seller</th>
+                <th>Orders</th>
+                <th>Revenue</th>
+                <th>Profit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (sellerPerformance && sellerPerformance.length > 0) { %> <%
+              sellerPerformance.forEach(function(seller) { %>
+              <tr>
+                <td><%= seller.seller_name %></td>
+                <td><%= seller.transactions %></td>
+                <td>
+                  ₹<%= parseFloat(seller.total_revenue).toLocaleString() %>
+                </td>
+                <td class="profit-positive">
+                  ₹<%= parseFloat(seller.total_profit).toLocaleString() %>
+                </td>
+              </tr>
+              <% }) %> <% } else { %>
+              <tr>
+                <td colspan="4" class="text-center">No data available</td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Sales Transactions Table -->
+      <div class="table-container">
+        <h3>📋 Sales Transactions</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Invoice</th>
+              <th>Date & Time</th>
+              <th>Seller</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Profit</th>
+              <th>Margin</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (sales && sales.length > 0) { %> <%
+            sales.forEach(function(sale) { const margin = sale.total_amount > 0
+            ? (sale.total_profit / sale.total_amount * 100) : 0; %>
+            <tr>
+              <td><strong>#<%= sale.id %></strong></td>
+              <td>
+                <small><%= new Date(sale.sale_date).toLocaleString() %></small>
+              </td>
+              <td><%= sale.seller_name || '-' %></td>
+              <td><%= sale.item_count %></td>
+              <td>
+                <strong
+                  >₹<%= parseFloat(sale.total_amount).toLocaleString()
+                  %></strong
+                >
+              </td>
+              <td
+                class="<%= sale.total_profit >= 0 ? 'profit-positive' : 'profit-negative' %>"
+              >
+                ₹<%= parseFloat(sale.total_profit).toLocaleString() %>
+              </td>
+              <td>
+                <span
+                  style="
+                    font-size: 12px;
+                    font-weight: 700;
+                    background: #f1f5f9;
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                  "
+                  ><%= margin.toFixed(1) %>%</span
+                >
+              </td>
+              <td>
+                <button
+                  class="view-details"
+                  onclick="viewSaleDetails(<%= sale.id %>)"
+                >
+                  View
+                </button>
+              </td>
+            </tr>
+            <% }) %> <% } else { %>
+            <tr>
+              <td colspan="8" class="text-center">
+                No sales found for selected period
+              </td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Sale Details Modal -->
+    <div id="saleModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3 style="margin-bottom: 20px; color: var(--primary)">
+          Transaction Details
+        </h3>
+        <div id="saleDetails"></div>
+      </div>
+    </div>
+
+    <script>
+      // Logic remains exactly as original
+      function viewSaleDetails(id) {
+        fetch(`/sales/details/${id}`)
+          .then((res) => res.json())
+          .then((data) => {
+            const sale = data.sale;
+            const items = data.items;
+
+            let itemsHtml =
+              '<table style="width:100%; margin-top:15px;"><thead><tr><th>Medicine</th><th>Batch</th><th>Qty</th><th>Price</th><th>Subtotal</th><th>Profit</th></tr></thead><tbody>';
+            items.forEach((item) => {
+              itemsHtml += `<tr>
+                            <td><small><strong>${
+                              item.medicine_name
+                            }</strong><br>${item.unit}</small></td>
+                            <td><small>${item.batch_no}</small></td>
+                            <td>${item.quantity}</td>
+                            <td>₹${parseFloat(item.selling_price).toFixed(
+                              2
+                            )}</td>
+                            <td>₹${parseFloat(
+                              item.subtotal
+                            ).toLocaleString()}</td>
+                            <td class="profit-positive">₹${parseFloat(
+                              item.profit
+                            ).toLocaleString()}</td>
+                        </tr>`;
+            });
+            itemsHtml += "</tbody></table>";
+
+            const margin =
+              sale.total_amount > 0
+                ? (sale.total_profit / sale.total_amount) * 100
+                : 0;
+
+            document.getElementById("saleDetails").innerHTML = `
+                        <div style="background:#f8fafc; padding:20px; border-radius:12px; margin-bottom:20px; border: 1px solid #e2e8f0;">
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px;">
+                                <p><strong>Invoice:</strong> #${sale.id}</p>
+                                <p><strong>Seller:</strong> ${
+                                  sale.seller_name || "-"
+                                }</p>
+                                <p><strong>Revenue:</strong> ₹${parseFloat(
+                                  sale.total_amount
+                                ).toLocaleString()}</p>
+                                <p><strong>Profit:</strong> ₹${parseFloat(
+                                  sale.total_profit
+                                ).toLocaleString()}</p>
+                                <p><strong>Margin:</strong> ${margin.toFixed(
+                                  1
+                                )}%</p>
+                                <p><strong>Date:</strong> ${new Date(
+                                  sale.created_at
+                                ).toLocaleString()}</p>
+                            </div>
+                        </div>
+                        <h4 style="font-size: 14px; margin-bottom: 10px;">Itemized Breakdown:</h4>
+                        ${itemsHtml}
+                    `;
+            document.getElementById("saleModal").style.display = "flex";
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Could not load sale details");
+          });
+      }
+
+      function closeModal() {
+        document.getElementById("saleModal").style.display = "none";
+      }
+      window.onclick = function (event) {
+        if (event.target == document.getElementById("saleModal")) closeModal();
+      };
+    </script>
+  </body>
+</html>

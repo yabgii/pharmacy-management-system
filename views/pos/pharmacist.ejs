@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pharmacist Dashboard - Pharmacy POS</title>
+    <!-- Modern Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #0f766e;
+        --primary-light: #14b8a6;
+        --accent: #6366f1;
+        --bg: #f8fafc;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --error: #ef4444;
+        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--bg);
+        color: var(--text-main);
+        line-height: 1.5;
+        min-height: 100vh;
+        padding: 20px;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      /* Consistent Background Accents */
+      .bg-circle {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(80px);
+        z-index: -1;
+        opacity: 0.15;
+      }
+      .circle-1 {
+        width: 400px;
+        height: 400px;
+        background: var(--primary);
+        top: -100px;
+        left: -100px;
+      }
+      .circle-2 {
+        width: 300px;
+        height: 300px;
+        background: var(--accent);
+        bottom: -50px;
+        right: -50px;
+      }
+
+      .container {
+        max-width: 1600px;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      /* Header Styling */
+      .header {
+        background: white;
+        padding: 24px;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+      }
+
+      .header-info h1 {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .header-info p {
+        color: var(--text-muted);
+        font-size: 14px;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        flex-wrap: wrap;
+      }
+
+      .stats {
+        display: flex;
+        gap: 12px;
+      }
+
+      .stat-card {
+        background: #f1f5f9;
+        padding: 10px 16px;
+        border-radius: 12px;
+        text-align: center;
+        min-width: 130px;
+      }
+
+      .stat-number {
+        display: block;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--primary);
+      }
+
+      .stat-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+
+      .logout-btn {
+        background: #fee2e2;
+        color: #dc2626;
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        border: 1px solid #fecaca;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .logout-btn:hover {
+        background: #fecaca;
+        transform: translateY(-1px);
+      }
+
+      /* Grid Layout */
+      .three-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 24px;
+      }
+
+      .card {
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        height: fit-content;
+      }
+
+      .card h3 {
+        font-size: 16px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-main);
+      }
+
+      /* Search Box */
+      .search-box {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+
+      .search-box input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 14px;
+        background: #f8fafc;
+        transition: all 0.2s;
+      }
+
+      .search-box input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+      }
+
+      .search-box button {
+        padding: 0 20px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      /* Medicine Grid */
+      .medicines-grid {
+        max-height: 600px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .medicines-grid::-webkit-scrollbar {
+        width: 6px;
+      }
+      .medicines-grid::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 10px;
+      }
+
+      .medicine-card {
+        background: #fff;
+        border: 1.5px solid #f1f5f9;
+        border-radius: 14px;
+        padding: 16px;
+        margin-bottom: 12px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+
+      .medicine-card:hover {
+        border-color: var(--primary-light);
+        transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+
+      .medicine-name {
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--text-main);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .medicine-details {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end; /* Aligns stock info to bottom of vertical stack */
+      }
+
+      .medicine-stock {
+        font-weight: 700;
+        color: var(--success);
+      }
+      .medicine-stock.low {
+        color: var(--warning);
+      }
+      .medicine-stock.out {
+        color: var(--error);
+      }
+      .medicine-price {
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 14px;
+      }
+
+      /* Expiry Badge Styles */
+      .expiry-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .expiry-critical {
+        background: #dc3545;
+        color: white;
+      }
+      .expiry-high {
+        background: #fd7e14;
+        color: white;
+      }
+      .expiry-warning {
+        background: #ffc107;
+        color: #333;
+      }
+      .expiry-info {
+        background: #17a2b8;
+        color: white;
+      }
+      .expiry-active {
+        background: #28a745;
+        color: white;
+      }
+      .expiry-expired {
+        background: #6c757d;
+        color: white;
+      }
+
+      /* Carts Section */
+      .carts-list {
+        max-height: 600px;
+        overflow-y: auto;
+      }
+      .cart-card {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 18px;
+        margin-bottom: 16px;
+        border: 1px solid #e2e8f0;
+      }
+
+      .cart-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+
+      .cart-title {
+        font-weight: 700;
+        color: var(--primary);
+      }
+      .cart-time {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .cart-item-details {
+        margin-bottom: 8px;
+        font-size: 13px;
+      }
+      .cart-medicine {
+        font-weight: 600;
+        display: block;
+      }
+      .cart-price {
+        color: var(--success);
+        font-weight: 700;
+        font-size: 16px;
+      }
+
+      .cart-status {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
+        text-transform: uppercase;
+      }
+      .status-draft {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .status-pending {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+
+      .cart-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+      }
+      .cart-btn {
+        flex: 1;
+        padding: 8px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+      .cart-btn-complete {
+        background: var(--success);
+        color: white;
+      }
+      .cart-btn-cashier {
+        background: var(--warning);
+        color: white;
+      }
+      .cart-btn-cancel {
+        background: #f1f5f9;
+        color: var(--error);
+      }
+
+      /* History Section */
+      .history-item {
+        padding: 12px;
+        border-bottom: 1px solid #f1f5f9;
+        margin-bottom: 8px;
+      }
+      .history-id {
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 13px;
+      }
+      .history-date {
+        font-size: 11px;
+        color: var(--text-muted);
+        float: right;
+      }
+      .history-total {
+        font-weight: 700;
+        display: block;
+        margin-top: 4px;
+      }
+
+      /* Quantity Modal */
+      .quantity-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .quantity-modal-content {
+        background: white;
+        border-radius: 24px;
+        width: 100%;
+        max-width: 400px;
+        padding: 30px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        animation: modalSlide 0.3s ease-out;
+      }
+      @keyframes modalSlide {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Payment Modal */
+      .payment-modal {
+        display: none;
+        position: fixed;
+        z-index: 1001;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .payment-modal-content {
+        background: white;
+        border-radius: 24px;
+        width: 100%;
+        max-width: 400px;
+        padding: 30px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        animation: modalSlide 0.3s ease-out;
+      }
+
+      .medicine-info {
+        background: #f1f5f9;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+      }
+      .info-label {
+        font-weight: 600;
+        color: var(--text-muted);
+        font-size: 12px;
+      }
+
+      .quantity-input-group label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+      .quantity-input-group input {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 20px;
+        text-align: center;
+        font-weight: 700;
+      }
+
+      .btn-add {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 15px;
+      }
+
+      .payment-options {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .payment-btn {
+        padding: 15px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-size: 16px;
+        transition: transform 0.2s;
+      }
+      .payment-btn:hover {
+        transform: translateY(-2px);
+      }
+      .payment-cash {
+        background: #10b981;
+        color: white;
+      }
+      .payment-card {
+        background: #3b82f6;
+        color: white;
+      }
+      .payment-upi {
+        background: #8b5cf6;
+        color: white;
+      }
+      .payment-insurance {
+        background: #f59e0b;
+        color: white;
+      }
+      .payment-other {
+        background: #6b7280;
+        color: white;
+      }
+
+      /* Responsive Adjustments */
+      @media (max-width: 1200px) {
+        .three-columns {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 850px) {
+        .three-columns {
+          grid-template-columns: 1fr;
+        }
+        .header {
+          flex-direction: column;
+          text-align: center;
+        }
+        .header-right {
+          flex-direction: column;
+          width: 100%;
+        }
+        .stats {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-circle circle-1"></div>
+    <div class="bg-circle circle-2"></div>
+
+    <div class="container">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-info">
+          <h1><span>💊</span> Pharmacist Dashboard</h1>
+          <p>Logged in: <strong><%= user.name %></strong> | <%= user.role %></p>
+        </div>
+
+        <div class="header-right">
+          <div class="stats">
+            <div class="stat-card">
+              <span class="stat-number"
+                >₹<%= todaySales ? todaySales.revenue.toLocaleString() : 0
+                %></span
+              >
+              <span class="stat-label">Today's Sales</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number" id="pendingCount"
+                ><%= pendingCount || 0 %></span
+              >
+              <span class="stat-label">Pending</span>
+            </div>
+          </div>
+          <form action="/auth/logout" method="GET" style="margin: 0">
+            <button type="submit" class="logout-btn">🚪 Logout</button>
+          </form>
+        </div>
+      </header>
+
+      <% if (success_msg && success_msg.length > 0) { %>
+      <div
+        style="
+          background: #ecfdf5;
+          color: #065f46;
+          padding: 12px;
+          border-radius: 12px;
+          margin-bottom: 20px;
+          border-left: 5px solid var(--success);
+        "
+      >
+        ✅ <%= success_msg %>
+      </div>
+      <% } %> <% if (error_msg && error_msg.length > 0) { %>
+      <div
+        style="
+          background: #fef2f2;
+          color: #991b1b;
+          padding: 12px;
+          border-radius: 12px;
+          margin-bottom: 20px;
+          border-left: 5px solid var(--error);
+        "
+      >
+        ⚠️ <%= error_msg %>
+      </div>
+      <% } %>
+
+      <div class="three-columns">
+        <!-- Medicines List -->
+        <div class="card">
+          <h3>🔍 Inventory Search</h3>
+          <div class="search-box">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search medicine name..."
+            />
+            <button onclick="searchMedicines()">Search</button>
+          </div>
+          <div id="medicinesList" class="medicines-grid">
+            <div
+              style="
+                text-align: center;
+                padding: 40px;
+                color: var(--text-muted);
+              "
+            >
+              Initializing inventory...
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Carts -->
+        <div class="card">
+          <h3>🛒 Active Transactions</h3>
+          <div id="cartsList" class="carts-list">
+            <div
+              style="
+                text-align: center;
+                padding: 40px;
+                color: var(--text-muted);
+              "
+            >
+              Syncing carts...
+            </div>
+          </div>
+        </div>
+
+        <!-- Sales History -->
+        <div class="card">
+          <h3>📜 Recent Completions</h3>
+          <div id="salesHistoryList" class="sales-history-list">
+            <div
+              style="
+                text-align: center;
+                padding: 40px;
+                color: var(--text-muted);
+              "
+            >
+              Loading logs...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quantity Modal -->
+    <div id="quantityModal" class="quantity-modal">
+      <div class="quantity-modal-content">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+          "
+        >
+          <h3 style="font-size: 18px">Add to Cart</h3>
+          <span
+            style="cursor: pointer; font-size: 24px"
+            onclick="closeQuantityModal()"
+            >&times;</span
+          >
+        </div>
+
+        <div id="medicineInfo" class="medicine-info">
+          <div><span class="info-label">MEDICINE</span></div>
+          <div id="medName" style="font-weight: 700; margin-bottom: 10px"></div>
+          <div style="display: flex; justify-content: space-between">
+            <div>
+              <span class="info-label">STOCK:</span>
+              <span id="stockQty" style="font-weight: 700"></span>
+            </div>
+            <div>
+              <span class="info-label">PRICE:</span> ₹<span
+                id="price"
+                style="font-weight: 700"
+              ></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="quantity-input-group">
+          <label>How many units?</label>
+          <input type="number" id="quantityInput" min="1" value="1" />
+          <div
+            id="stockWarning"
+            style="
+              color: var(--error);
+              font-size: 12px;
+              margin-top: 8px;
+              display: none;
+              font-weight: 600;
+            "
+          >
+            ⚠️ Not enough stock available!
+          </div>
+        </div>
+
+        <button class="btn-add" onclick="submitAddToCart()">
+          Add to Transaction
+        </button>
+      </div>
+    </div>
+
+    <!-- Payment Method Modal -->
+    <div id="paymentModal" class="payment-modal">
+      <div class="payment-modal-content">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+          "
+        >
+          <h3 style="font-size: 18px">Select Payment Method</h3>
+          <span
+            style="cursor: pointer; font-size: 24px"
+            onclick="closePaymentModal()"
+            >&times;</span
+          >
+        </div>
+
+        <div class="payment-options">
+          <button
+            onclick="completeSaleWithPayment('cash')"
+            class="payment-btn payment-cash"
+          >
+            💵 Cash
+          </button>
+          <button
+            onclick="completeSaleWithPayment('cbe')"
+            class="payment-btn payment-cbe"
+          >
+            🏦 CBE (Commercial Bank of Ethiopia)
+          </button>
+          <button
+            onclick="completeSaleWithPayment('telebirr')"
+            class="payment-btn payment-telebirr"
+          >
+            📱 Telebirr
+          </button>
+          <button
+            onclick="completeSaleWithPayment('other')"
+            class="payment-btn payment-other"
+          >
+            🔄 Other
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      var selectedMedicineId = null;
+      var selectedMedicineName = "";
+      var selectedMedicineStock = 0;
+      var selectedMedicinePrice = 0;
+      var currentSaleIdForPayment = null;
+
+      function loadCarts() {
+        fetch("/pos/get-active-sales")
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (sales) {
+            var container = document.getElementById("cartsList");
+            if (!sales || sales.length === 0) {
+              container.innerHTML =
+                '<div style="text-align:center; padding:40px; color:var(--text-muted);">🛒 No active carts<br><small>Click a medicine to start</small></div>';
+              document.getElementById("pendingCount").innerText = "0";
+              return;
+            }
+            var html = "";
+            for (var i = 0; i < sales.length; i++) {
+              var sale = sales[i];
+              var statusClass =
+                sale.status === "draft" ? "status-draft" : "status-pending";
+              var statusText = sale.status === "draft" ? "Draft" : "At Cashier";
+
+              html += '<div class="cart-card">';
+              html +=
+                '<div class="cart-header"><span class="cart-title">Cart #' +
+                sale.id +
+                '</span><span class="cart-time">' +
+                new Date(sale.created_at).toLocaleTimeString() +
+                "</span></div>";
+              html +=
+                '<div class="cart-item-details"><span class="cart-medicine">💊 ' +
+                (sale.items_summary || "Empty") +
+                "</span></div>";
+              html +=
+                '<div style="display:flex; justify-content:space-between; align-items:center;">';
+              html +=
+                '<span class="cart-price">₹' +
+                parseFloat(sale.total_amount || 0).toFixed(2) +
+                "</span>";
+              html +=
+                '<span class="cart-status ' +
+                statusClass +
+                '">' +
+                statusText +
+                "</span></div>";
+              html += '<div class="cart-actions">';
+              if (sale.status === "draft") {
+                html +=
+                  '<button onclick="showPaymentModal(' +
+                  sale.id +
+                  ')" class="cart-btn cart-btn-complete">Finish</button>';
+                html +=
+                  '<a href="/pos/send-to-cashier/' +
+                  sale.id +
+                  '" class="cart-btn cart-btn-cashier" onclick="return confirm(\'Send to cashier?\')">To Cashier</a>';
+              }
+              html +=
+                '<a href="/pos/cancel/' +
+                sale.id +
+                '" class="cart-btn cart-btn-cancel" onclick="return confirm(\'Delete cart?\')">Cancel</a>';
+              html += "</div></div>";
+            }
+            container.innerHTML = html;
+            var pendingCount = sales.filter(function (s) {
+              return s.status === "pending";
+            }).length;
+            document.getElementById("pendingCount").innerText = pendingCount;
+          })
+          .catch(console.error);
+      }
+
+      function showPaymentModal(saleId) {
+        currentSaleIdForPayment = saleId;
+        document.getElementById("paymentModal").style.display = "flex";
+      }
+
+      function closePaymentModal() {
+        document.getElementById("paymentModal").style.display = "none";
+        currentSaleIdForPayment = null;
+      }
+
+      function completeSaleWithPayment(paymentMethod) {
+        if (!currentSaleIdForPayment) return;
+
+        var form = document.createElement("form");
+        form.method = "POST";
+        form.action = "/pos/complete/" + currentSaleIdForPayment;
+        form.innerHTML =
+          '<input type="hidden" name="payment_method" value="' +
+          paymentMethod +
+          '">';
+        document.body.appendChild(form);
+        form.submit();
+      }
+      function loadSalesHistory() {
+        fetch("/pos/get-sales-history")
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (sales) {
+            var container = document.getElementById("salesHistoryList");
+            if (!sales || sales.length === 0) {
+              container.innerHTML =
+                '<div style="text-align:center; padding:40px; color:var(--text-muted);">No history found</div>';
+              return;
+            }
+            var html = "";
+            for (var i = 0; i < sales.length; i++) {
+              var sale = sales[i];
+              html += '<div class="history-item">';
+              html +=
+                '<div><span class="history-id">#ID-' +
+                sale.id +
+                '</span><span class="history-date">' +
+                new Date(sale.completed_at).toLocaleDateString() +
+                "</span></div>";
+              html +=
+                '<div style="font-size:12px; color:var(--text-muted); margin:4px 0;">' +
+                (sale.items_summary || "") +
+                "</div>";
+              html +=
+                '<span class="history-total">₹' +
+                parseFloat(sale.total_amount || 0).toFixed(2) +
+                "</span>";
+              html += "</div>";
+            }
+            container.innerHTML = html;
+          })
+          .catch(console.error);
+      }
+
+      function loadAllMedicines() {
+        fetch("/pos/get-all-medicines")
+          .then(function (response) {
+            return response.json();
+          })
+          .then(displayMedicines)
+          .catch(console.error);
+      }
+
+      function searchMedicines() {
+        var search = document.getElementById("searchInput").value;
+        if (search.length < 2) {
+          loadAllMedicines();
+          return;
+        }
+        fetch("/pos/search-medicines?search=" + encodeURIComponent(search))
+          .then(function (response) {
+            return response.json();
+          })
+          .then(displayMedicines)
+          .catch(console.error);
+      }
+
+      function getExpiryBadge(daysToExpiry) {
+        if (daysToExpiry < 0) {
+          return '<span class="expiry-badge expiry-expired">❌ EXPIRED</span>';
+        } else if (daysToExpiry === 0) {
+          return '<span class="expiry-badge expiry-critical">🚨 EXPIRES TODAY</span>';
+        } else if (daysToExpiry <= 1) {
+          return (
+            '<span class="expiry-badge expiry-critical">🚨 ' +
+            daysToExpiry +
+            " DAY LEFT</span>"
+          );
+        } else if (daysToExpiry <= 3) {
+          return (
+            '<span class="expiry-badge expiry-critical">⚠️ ' +
+            daysToExpiry +
+            " DAYS</span>"
+          );
+        } else if (daysToExpiry <= 7) {
+          return (
+            '<span class="expiry-badge expiry-high">⚠️ ' +
+            daysToExpiry +
+            " DAYS</span>"
+          );
+        } else if (daysToExpiry <= 15) {
+          return (
+            '<span class="expiry-badge expiry-warning">📅 ' +
+            daysToExpiry +
+            " DAYS</span>"
+          );
+        } else if (daysToExpiry <= 30) {
+          return (
+            '<span class="expiry-badge expiry-warning">📅 ' +
+            daysToExpiry +
+            " DAYS</span>"
+          );
+        } else if (daysToExpiry <= 60) {
+          return (
+            '<span class="expiry-badge expiry-info">📅 ' +
+            daysToExpiry +
+            " DAYS</span>"
+          );
+        } else if (daysToExpiry <= 90) {
+          return (
+            '<span class="expiry-badge expiry-info">📅 ' +
+            daysToExpiry +
+            " DAYS</span>"
+          );
+        } else {
+          return '<span class="expiry-badge expiry-active">✅ ACTIVE</span>';
+        }
+      }
+
+      function displayMedicines(medicines) {
+        var container = document.getElementById("medicinesList");
+        if (!medicines || medicines.length === 0) {
+          container.innerHTML =
+            '<div style="text-align:center; padding:40px;">No medicines found</div>';
+          return;
+        }
+        var html = "";
+        for (var i = 0; i < medicines.length; i++) {
+          var med = medicines[i];
+          var stockClass = "medicine-stock";
+          var onClickAttr =
+            'onclick="showQuantityModal(' +
+            med.id +
+            ", '" +
+            med.name.replace(/'/g, "\\'") +
+            "', " +
+            med.total_stock +
+            ", " +
+            med.selling_price +
+            ')"';
+
+          var expiryBadgeHtml = "";
+          if (med.earliest_expiry) {
+            var today = new Date();
+            var expiryDate = new Date(med.earliest_expiry);
+            var daysToExpiry = Math.ceil(
+              (expiryDate - today) / (1000 * 60 * 60 * 24)
+            );
+            expiryBadgeHtml = getExpiryBadge(daysToExpiry);
+          } else {
+            expiryBadgeHtml =
+              '<span class="expiry-badge expiry-active">✅ ACTIVE</span>';
+          }
+
+          if (med.total_stock <= 0) {
+            stockClass += " out";
+            onClickAttr = "";
+          } else if (med.total_stock <= (med.min_stock_level || 10)) {
+            stockClass += " low";
+          }
+
+          html += '<div class="medicine-card" ' + onClickAttr + ">";
+          html +=
+            '<div class="medicine-name">' +
+            med.name +
+            expiryBadgeHtml +
+            "</div>";
+
+          // MODIFIED: Unit is on top, Stock amount is directly under it
+          html += '<div class="medicine-details">';
+          html += "<span>" + (med.generic_name || "") + "</span>";
+          html +=
+            '<div style="text-align: right; display: flex; flex-direction: column;">';
+          html +=
+            '<small style="font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">' +
+            med.unit +
+            "</small>";
+          html +=
+            '<span class="' +
+            stockClass +
+            '" style="font-size: 14px; margin-top: 2px;">📦 ' +
+            (med.total_stock <= 0 ? "Out of Stock" : med.total_stock) +
+            "</span>";
+          html += "</div></div>";
+
+          html +=
+            '<div class="medicine-details"><span class="medicine-price">₹' +
+            parseFloat(med.selling_price || 0).toFixed(2) +
+            "</span><span>🏭 " +
+            (med.manufacturer_name || "N/A") +
+            "</span></div>";
+          html += "</div>";
+        }
+        container.innerHTML = html;
+      }
+
+      function showQuantityModal(medicineId, medicineName, stock, price) {
+        selectedMedicineId = medicineId;
+        selectedMedicineName = medicineName;
+        selectedMedicineStock = stock;
+        selectedMedicinePrice = price;
+        document.getElementById("medName").innerText = medicineName;
+        document.getElementById("stockQty").innerText = stock;
+        document.getElementById("price").innerText =
+          parseFloat(price).toFixed(2);
+        document.getElementById("quantityInput").value = 1;
+        document.getElementById("stockWarning").style.display = "none";
+        document.getElementById("quantityModal").style.display = "flex";
+      }
+
+      function closeQuantityModal() {
+        document.getElementById("quantityModal").style.display = "none";
+        selectedMedicineId = null;
+      }
+
+      function submitAddToCart() {
+        var quantity = parseInt(document.getElementById("quantityInput").value);
+        if (isNaN(quantity) || quantity < 1) {
+          alert("Invalid quantity");
+          return;
+        }
+        if (quantity > selectedMedicineStock) {
+          document.getElementById("stockWarning").style.display = "block";
+          return;
+        }
+
+        fetch("/pos/create-draft-ajax", { method: "POST" })
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+            if (data.sale_id) {
+              var form = document.createElement("form");
+              form.method = "POST";
+              form.action = "/pos/add-to-cart-fefo";
+              form.innerHTML =
+                '<input type="hidden" name="sale_id" value="' +
+                data.sale_id +
+                '"><input type="hidden" name="medicine_id" value="' +
+                selectedMedicineId +
+                '"><input type="hidden" name="quantity" value="' +
+                quantity +
+                '">';
+              document.body.appendChild(form);
+              form.submit();
+            }
+          });
+      }
+
+      var searchTimeout;
+      document
+        .getElementById("searchInput")
+        .addEventListener("input", function () {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(searchMedicines, 500);
+        });
+
+      loadAllMedicines();
+      loadCarts();
+      loadSalesHistory();
+      setInterval(loadCarts, 10000);
+
+      window.onclick = function (event) {
+        if (event.target == document.getElementById("quantityModal"))
+          closeQuantityModal();
+        if (event.target == document.getElementById("paymentModal"))
+          closePaymentModal();
+      };
+    </script>
+  </body>
+</html>

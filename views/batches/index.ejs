@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Batches - Pharmacy Management</title>
+    <!-- Modern Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #0f766e;
+        --primary-light: #14b8a6;
+        --accent: #6366f1;
+        --bg: #f8fafc;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --error: #ef4444;
+        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--bg);
+        color: var(--text-main);
+        line-height: 1.5;
+        padding: 20px;
+        position: relative;
+        min-height: 100vh;
+      }
+
+      /* Background Accents */
+      .bg-circle {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(80px);
+        z-index: -1;
+        opacity: 0.1;
+      }
+      .circle-1 {
+        width: 400px;
+        height: 400px;
+        background: var(--primary);
+        top: -100px;
+        left: -100px;
+      }
+      .circle-2 {
+        width: 300px;
+        height: 300px;
+        background: var(--accent);
+        bottom: -50px;
+        right: -50px;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+
+      h2 {
+        color: var(--primary);
+        font-size: 24px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .btn-group-top {
+        display: flex;
+        gap: 10px;
+      }
+
+      /* Statistics Grid */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+
+      .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+        text-align: center;
+        border-bottom: 4px solid transparent;
+        transition: transform 0.2s;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-3px);
+      }
+      .stat-card h3 {
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 5px;
+      }
+      .stat-card p {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+      }
+
+      .stat-total {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      .stat-expiring {
+        border-color: var(--warning);
+        color: var(--warning);
+      }
+      .stat-expired {
+        border-color: var(--error);
+        color: var(--error);
+      }
+      .stat-lowstock {
+        border-color: #fd7e14;
+        color: #fd7e14;
+      }
+      .stat-outofstock {
+        border-color: var(--text-muted);
+        color: var(--text-muted);
+      }
+
+      /* Filters & Search */
+      .action-bar {
+        background: white;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 25px;
+      }
+
+      .filters {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .search-box {
+        flex: 1;
+        min-width: 300px;
+        display: flex;
+        gap: 10px;
+      }
+
+      .search-box input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        font-family: inherit;
+        background: #f8fafc;
+      }
+
+      .search-box input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+      }
+
+      .btn {
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+      }
+      .btn-primary:hover {
+        background: var(--primary-light);
+      }
+
+      .btn-dashboard {
+        background: #f1f5f9;
+        color: var(--text-main);
+      }
+      .btn-dashboard:hover {
+        background: #e2e8f0;
+      }
+
+      .filter-group {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .filter-btn {
+        padding: 8px 16px;
+        background: #f1f5f9;
+        color: var(--text-muted);
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s;
+      }
+
+      .filter-btn:hover {
+        background: #e2e8f0;
+      }
+      .filter-btn.active {
+        background: var(--primary);
+        color: white;
+      }
+
+      .btn-add {
+        background: var(--success);
+        color: white;
+      }
+
+      /* Table Styles */
+      .table-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      th {
+        background: #f8fafc;
+        padding: 16px;
+        text-align: left;
+        color: var(--text-muted);
+        font-weight: 700;
+        font-size: 12px;
+        text-transform: uppercase;
+        border-bottom: 2px solid #f1f5f9;
+      }
+      td {
+        padding: 16px;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      /* Row Highlighting (Preserved Logic) */
+      tr.expired-row {
+        background-color: #fef2f2;
+      }
+      tr.expiring-row {
+        background-color: #fffbeb;
+      }
+      tr.lowstock-row {
+        background-color: #fff7ed;
+      }
+
+      /* Badges */
+      .badge {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        display: inline-block;
+      }
+      .badge-good {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .badge-expiring {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .badge-expired {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .badge-low {
+        background: #ffedd5;
+        color: #c2410c;
+      }
+      .badge-out {
+        background: #f1f5f9;
+        color: var(--text-muted);
+      }
+
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 8px;
+      }
+      .btn-edit {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .btn-delete {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+      .btn-view {
+        background: #e0f2fe;
+        color: #0369a1;
+      }
+      .btn-medicine {
+        background: #f1f5f9;
+        color: var(--primary);
+      }
+
+      /* Modal Styling */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 24px;
+        width: 100%;
+        max-width: 500px;
+        position: relative;
+        animation: modalSlide 0.3s ease-out;
+      }
+
+      @keyframes modalSlide {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .close {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        font-size: 24px;
+        cursor: pointer;
+        color: var(--text-muted);
+      }
+
+      /* Responsive Table */
+      @media (max-width: 1024px) {
+        table,
+        thead,
+        tbody,
+        th,
+        td,
+        tr {
+          display: block;
+        }
+        thead {
+          display: none;
+        }
+        tr {
+          border-bottom: 2px solid #f1f5f9;
+          padding: 15px;
+        }
+        td {
+          border: none;
+          padding: 8px 0 8px 140px;
+          position: relative;
+          min-height: 35px;
+          text-align: right;
+        }
+        td:before {
+          content: attr(data-label);
+          position: absolute;
+          left: 0;
+          width: 130px;
+          text-align: left;
+          font-weight: 700;
+          color: var(--text-muted);
+          font-size: 11px;
+          text-transform: uppercase;
+        }
+        .search-box {
+          width: 100%;
+        }
+        .header-flex {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-circle circle-1"></div>
+    <div class="bg-circle circle-2"></div>
+
+    <div class="container">
+      <div class="header-flex">
+        <h2><span>📦</span> Batch Management</h2>
+        <div class="btn-group-top">
+          <a href="/batches/create" class="btn btn-add">+ Add New Batch</a>
+          <a href="/dashboard" class="btn btn-dashboard">← Back to Dashboard</a>
+        </div>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="stats">
+        <div class="stat-card stat-total">
+          <h3><%= stats.total_batches %></h3>
+          <p>Total Batches</p>
+        </div>
+        <div class="stat-card stat-expiring">
+          <h3><%= stats.expiring_count || 0 %></h3>
+          <p>Expiring (30d)</p>
+        </div>
+        <div class="stat-card stat-expired">
+          <h3><%= stats.expired_count || 0 %></h3>
+          <p>Expired</p>
+        </div>
+        <div class="stat-card stat-lowstock">
+          <h3><%= stats.lowstock_count || 0 %></h3>
+          <p>Low Stock</p>
+        </div>
+        <div class="stat-card stat-outofstock">
+          <h3><%= stats.outofstock_count || 0 %></h3>
+          <p>Out of Stock</p>
+        </div>
+      </div>
+
+      <!-- Filters & Search -->
+      <div class="action-bar">
+        <div class="filters">
+          <form method="GET" action="/batches" class="search-box">
+            <input
+              type="text"
+              name="search"
+              placeholder="Search batch #, medicine..."
+              value="<%= search %>"
+            />
+            <button type="submit" class="btn btn-primary">Search</button>
+            <% if (search) { %>
+            <a href="/batches" class="btn btn-medicine">Clear</a>
+            <% } %>
+          </form>
+          <div class="filter-group">
+            <a href="/batches" class="filter-btn <%= !status ? 'active' : '' %>"
+              >All</a
+            >
+            <a
+              href="/batches?status=expiring"
+              class="filter-btn <%= status === 'expiring' ? 'active' : '' %>"
+              >Expiring Soon</a
+            >
+            <a
+              href="/batches?status=expired"
+              class="filter-btn <%= status === 'expired' ? 'active' : '' %>"
+              >Expired</a
+            >
+            <a
+              href="/batches?status=lowstock"
+              class="filter-btn <%= status === 'lowstock' ? 'active' : '' %>"
+              >Low Stock</a
+            >
+            <a
+              href="/batches?status=outofstock"
+              class="filter-btn <%= status === 'outofstock' ? 'active' : '' %>"
+              >Out of Stock</a
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Batches Table -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Medicine</th>
+              <th>Batch No</th>
+              <th>Supplier</th>
+              <th>Quantity</th>
+              <th>Cost Price</th>
+              <th>Selling Price</th>
+              <th>Expiry Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (batches.length === 0) { %>
+            <tr>
+              <td
+                colspan="9"
+                style="
+                  text-align: center;
+                  padding: 50px;
+                  color: var(--text-muted);
+                "
+              >
+                No batches found matching your criteria.
+                <a
+                  href="/batches/create"
+                  style="color: var(--primary); font-weight: 700"
+                  >Add your first batch</a
+                >
+              </td>
+            </tr>
+            <% } else { %> <% batches.forEach(batch => { const today = new
+            Date(); const expiryDate = new Date(batch.expiry_date); const
+            daysToExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 *
+            24)); let rowClass = ''; let statusClass = ''; let statusText = '';
+            if (daysToExpiry < 0) { rowClass = 'expired-row'; statusClass =
+            'badge-expired'; statusText = 'Expired'; } else if (daysToExpiry <=
+            30) { rowClass = 'expiring-row'; statusClass = 'badge-expiring';
+            statusText = `${daysToExpiry}d left`; } else if (daysToExpiry <= 90)
+            { rowClass = 'expiring-row'; statusClass = 'badge-expiring';
+            statusText = `${daysToExpiry}d left`; } else if (batch.quantity <=
+            10 && batch.quantity > 0) { rowClass = 'lowstock-row'; statusClass =
+            'badge-low'; statusText = 'Low Stock'; } else if (batch.quantity ===
+            0) { statusClass = 'badge-out'; statusText = 'Out of Stock'; } else
+            { statusClass = 'badge-good'; statusText = 'Good'; } %>
+            <tr class="<%= rowClass %>">
+              <td data-label="Medicine">
+                <strong><%= batch.medicine_name %></strong><br /><small
+                  ><%= batch.unit %></small
+                >
+              </td>
+              <td data-label="Batch No"><%= batch.batch_no %></td>
+              <td data-label="Supplier"><%= batch.supplier_name || '-' %></td>
+              <td data-label="Quantity"><%= batch.quantity %></td>
+              <td data-label="Cost">
+                ₹<%= parseFloat(batch.cost_price).toFixed(2) %>
+              </td>
+              <td data-label="Selling">
+                ₹<%= parseFloat(batch.selling_price).toFixed(2) %>
+              </td>
+              <td data-label="Expiry">
+                <%= new Date(batch.expiry_date).toLocaleDateString() %>
+              </td>
+              <td data-label="Status">
+                <span class="badge <%= statusClass %>"><%= statusText %></span>
+              </td>
+              <td data-label="Actions">
+                <div
+                  style="
+                    display: flex;
+                    gap: 4px;
+                    justify-content: flex-end;
+                    flex-wrap: wrap;
+                  "
+                >
+                  <a
+                    href="/medicines/edit/<%= batch.medicine_id %>"
+                    class="btn btn-sm btn-medicine"
+                    >Medicine</a
+                  >
+                  <a
+                    href="/batches/edit/<%= batch.id %>"
+                    class="btn btn-sm btn-edit"
+                    >Edit</a
+                  >
+                  <form
+                    action="/batches/delete/<%= batch.id %>"
+                    method="POST"
+                    style="display: inline"
+                  >
+                    <button
+                      type="submit"
+                      class="btn btn-sm btn-delete"
+                      onclick="return confirm('Delete this batch?')"
+                    >
+                      Delete
+                    </button>
+                  </form>
+                  <button
+                    class="btn btn-sm btn-view"
+                    onclick="viewBatchDetails(<%= batch.id %>)"
+                  >
+                    Details
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <% }) %> <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Batch Details Modal -->
+    <div id="batchModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3 style="margin-bottom: 20px; color: var(--primary)">
+          Batch Details
+        </h3>
+        <div id="batchDetails"></div>
+      </div>
+    </div>
+
+    <script>
+      // Functionality preserved exactly as requested
+      function viewBatchDetails(id) {
+        fetch(`/batches/details/${id}`)
+          .then((res) => res.json())
+          .then((batch) => {
+            const modal = document.getElementById("batchDetails");
+            modal.innerHTML = `
+                <table style="width:100%; font-size: 14px;">
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Medicine:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">${
+                      batch.medicine_name
+                    } (${batch.unit})</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Batch No:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">${
+                      batch.batch_no
+                    }</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Supplier:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">${
+                      batch.supplier_name || "-"
+                    }</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Quantity:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">${
+                      batch.quantity
+                    }</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Cost Price:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">₹${parseFloat(
+                      batch.cost_price
+                    ).toFixed(2)}</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Selling Price:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">₹${parseFloat(
+                      batch.selling_price
+                    ).toFixed(2)}</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Expiry:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">${new Date(
+                      batch.expiry_date
+                    ).toLocaleDateString()}</td></tr>
+                    <tr><td style="padding: 8px 0;"><strong>Logged On:</strong></td><td style="padding: 8px 0; text-align: right;">${new Date(
+                      batch.created_at
+                    ).toLocaleString()}</td></tr>
+                </table>
+            `;
+            document.getElementById("batchModal").style.display = "flex";
+          });
+      }
+
+      function closeModal() {
+        document.getElementById("batchModal").style.display = "none";
+      }
+
+      window.onclick = function (event) {
+        if (event.target == document.getElementById("batchModal")) closeModal();
+      };
+    </script>
+  </body>
+</html>
